@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="../lib/underscore.js"></script>
+	<script src="../lib/jquery-1.9.0.min.js"></script>
+	<script src="../lib/backbone.js"></script>
+</head>
+<body>
+
+
+	<script>
+	/*model*/
+
+    var TodoItem = Backbone.Model.extend({
+    urlRoot: "/todos",//resetful wenb service;
+    defaults: { //default attributes
+    	description: "Empty todo",
+    	sdtatus: "incomplete"
+    }
+    /*can set like this
+    default: function() {
+			return {
+	    	title : "checkup",
+	    	date : new Date()
+			} 
+    }
+
+    */
+    });
+
+    var todoItem = new TodoItem({id:1}); //fetch todo with id = 1;
+
+    todoItem.fetch(); //ger/todos/1;
+
+    todoItem.set({status:"complete"}); //update the todo;
+
+    todoItem.save(); //put/todos/1 with JSON params;
+
+    todoItem.get("id");//
+
+    todoItem.destroy();//delete/todos/2;
+
+    todoItem.toJSON();//get json from model;
+
+    todoItem.on("event-name",function() {
+    	console.log("event-name happened!");
+    }); //to listen for an event on a model;
+    /*
+		todoItem.on(<event>,<method>);
+		change , when an attribute is modefied
+		change:<attr> , when <attr> is modefied
+		destroy , when a model is destroyed
+		sync , whenever successfully synced
+		error, when model save or validation fails
+		all, any triggered event
+    */
+
+    todoItem.trigger('event-name'); //run the event;
+
+
+    var todoTing = function() {
+    	console.log("it is change");
+    };
+    todoItem.on("change",todoTing); //to listen for changes;
+    todoItem.set({description:"Fill prescription"}); //event trigger on change;
+    todoTing.set({description:"Fill prescription"},{silent:true}); //set without trigger event;
+    todoItem.off("change",todoTing); //remove event listener;
+
+
+	
+	</script>
+
+</body>
+</html>

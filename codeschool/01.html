@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="../lib/underscore.js"></script>
+	<script src="../lib/jquery-1.9.0.min.js"></script>
+	<script src="../lib/backbone.js"></script>
+</head>
+<body>
+<div id="app"></div>
+
+	<script>
+	// create an Appointment model class.
+		var Appointment = Backbone.Model.extend({});
+	//create model instance.	
+		var appointment = new Appointment({title: 'Checkup'});
+	//create view class.
+	var AppointmentView = Backbone.View.extend({
+		//define the AppointmentView render function so we can actually create some HTML
+		render: function() {
+			$(this.el).html("<li>" + this.model.get("title") + "</li>" ); 
+		}
+	});
+	//create view instance.
+	var appointmentView = new AppointmentView({model: appointment});
+
+	//set the title of the appointment instance
+	appointment.set('title', 'My knee hurts');
+	//Set the html of #app element to the appointmentView element
+	appointmentView.render();
+	$('#app').html(appointmentView.el);
+
+	</script>
+
+</body>
+</html>

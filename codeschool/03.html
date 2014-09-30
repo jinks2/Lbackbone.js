@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="../lib/underscore.js"></script>
+	<script src="../lib/jquery-1.9.0.min.js"></script>
+	<script src="../lib/backbone.js"></script>
+</head>
+<body>
+
+
+	<script>
+	/*view*/
+
+    var SimpleView = Backbone.View.extend({});
+    var simpleView =  new SimpleView();
+    console.log(simpleView.el); //<div></div> default
+
+
+    var SimpleView = Backbone.View.extend({tagName:"li"});
+    var simpleView =  new SimpleView();
+    console.log(simpleView.el); //<li></li>
+
+    
+    var TodoItem = Backbone.Model.extend({
+        defaults: { 
+            description: "Empty todo",
+            sdtatus: "incomplete"
+        }
+    });
+    var todoItem = new TodoItem(); 
+
+    var TodoView = Backbone.View.extend({
+        tagName: "article",
+        id: "todo-view",
+        className: "todo",
+        template: _.template("<h3><%= description %></h3>"), 
+        //underscore.js; also can use other like: <h3>{{description}}</h3>  Mustache.js
+        events: {
+            "click h3" : "alertStatus"
+           /*
+            <event> <selector> : <method>
+            example :
+            "dbclick"
+            "click .icon.doc"
+            "click .show_notes"
+            "mouseover .title .data"
+            "select"
+            "open"
+            "toggleNotes"
+            "editAccessLevel"
+            "showTooltip"
+           */
+        },
+        alertStatus: function(e) {
+            alert("Hey you clicked the h3!")
+        },
+        render: function() {
+            var attributes = this.model.toJSON();
+            this.$el.html(this.template(attributes));
+        }
+    });
+    var todoView = new TodoView({model:todoItem});
+    todoView.render();
+    console.log(todoView.el); //todoView.$el :this is jquery object
+    $("body").append(todoView.el);
+    
+	
+	</script>
+
+	<script src="http://127.0.0.1:81/_/js/reloader.js"></script>
+</body>
+</html>
