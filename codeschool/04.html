@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="../lib/underscore.js"></script>
+	<script src="../lib/jquery-1.9.0.min.js"></script>
+	<script src="../lib/backbone.js"></script>
+    <style>
+    .incomplete{
+        background-color: #ccc;
+    }
+    .complete{
+        background-color: pink;
+    }
+    </style>
+</head>
+<body>
+
+
+	<script>
+    
+    var TodoItem = Backbone.Model.extend({
+        defaults: { 
+            description: "Empty todo",
+            sdtatus: "incomplete"
+        },
+        toggleStatus: function() {
+            if(this.get("status") === "incomplete") {
+                this.set({"status" : "complete"}); //model logic in model
+            } else {
+                this.set({"status" : "incomplete"});
+            }
+            //this.save(); PUT/todos/1; 
+            console.log(this.get("status"));
+        }
+    });
+    var todoItem = new TodoItem(); 
+
+    var TodoView = Backbone.View.extend({
+        events: {
+            "change input" : "toggleStatus"
+        },
+        initialize: function() {
+            this.model.on("change",this.render,this); //the  secend this meaning window,so must add the third this;
+        },
+        toggleStatus: function() {
+           this.model.toggleStatus();
+        },
+        template: _.template("<h3 class='<%= status %>'>" + "<input type=checkbox" + "<% if(status === 'complete') console.log('checked') %> />" +
+           " <%= description %></h3>"), 
+        render: function() {
+            var attributes = this.model.toJSON();
+            console.log(attributes.status);
+            this.$el.html(this.template(attributes));
+        }
+    });
+    var todoView = new TodoView({model:todoItem});
+    todoView.render();
+    $("body").append(todoView.el);
+    
+	
+
+
+
+    //another example
+    var Appointment = Backbone.Model.extend({
+      defaults: {
+        cancelled : false,
+        title: "this is title"
+      },
+      cancel: function(){
+        console.log(this.get("cancelled"));
+        this.set({cancelled: true});
+        console.log(this.get("cancelled"));
+        //this.save();
+      }
+    });
+    var appointment = new Appointment();
+    var AppointmentView = Backbone.View.extend({
+      template: _.template('<span class="<% if(cancelled) print("cancelled") %>">' +
+                            '<%= title %></span>' +
+                            '<a href="#">x</a>'),
+      
+      initialize: function(){
+        this.model.on('change', this.render, this);
+        //this.model.on('destroy', this.remove, this);
+      },
+
+      events:  { "click a": "cancel" },
+      cancel: function(){
+        this.model.cancel();
+        this.remove();
+      },
+      render: function(){
+        this.$el.html(this.template(this.model.toJSON()));
+      },
+      remove: function(){
+        this.$el.remove();
+      }
+    });
+    var appointmentView = new AppointmentView({model:appointment});
+    appointmentView.render();
+    $("body").append(appointmentView.el);
+	</script>
+
+</body>
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="../lib/underscore.js"></script>
+	<script src="../lib/jquery-1.9.0.min.js"></script>
+	<script src="../lib/backbone.js"></script>
+</head>
+<body>
+
+
+	<script>
+    /*Colooection*/
+
+    var TodoItem = Backbone.Model.extend();
+    var todoItem = new TodoItem(); 
+
+    //use collection ,TodoList manages a set of TodoItem model instances
+    var TodoList = Backbone.Collection.extend({
+        model: TodoItem,
+        //url: "/todos"//URL to get JSON data form
+    });
+    var todoList = new TodoList(); 
+    /*
+    todoList.length; //get number od models;
+    todoList.add(todoItem1); //add a model instance;
+    todoList.remove(todoItem1); //removing a model instance;    
+    todoList.at(0);  //get model instance at index 0;
+    todoList.get(1);  //get by 1;
+    */
+
+    todoList.on("event-name", function() { //to listen for an event om collection, just like model
+        alert("event-name happend");
+    });
+    /*Build-in events: alse can use events in model
+    add : when a model is added;
+    remove : when a model is removed;
+    reset : when reset or fetched;
+    */
+    todoList.trigger("event-name"); //run the event;
+    todoList.on("reset",function() {
+         alert("fetched " + this.length + " appointments from the server or locals");
+    });
+    todoList.on('add', function(todolist){
+      console.log("Dr. Goodparts added the " + todolist.get('title') + " appointment");
+    });
+
+
+
+    var todos = [
+        {description: "pick up milk", status: "incomplete",id: 1},
+        {description: "Get a car wash", status: "incomplete",id: 2},
+        {description: "Learn Backbone", status: "incomplete",id: 3}
+    ];
+    todoList.reset(todos);  //1.add local data
+    //todoList.fetch({silent: true}); //2. use GET/todos ,add event listen so use silent:true;
+    todoList.add({
+        description: "add this in lase",
+        status: "incomplete",
+        id: 4
+    });
+
+    //use forEach
+    todoList.forEach(function(todoItem) {
+        alert(todoItem.get("description"));
+    });
+    //build an array of descriptions
+    todoList.map(function(todoItem) {
+        return todoItem.get("description");
+    });
+    //filter models by some criteria
+    todoList.filter(function(todoItem) {
+        return todoItem.get("status") === "incomplete";
+    });
+    //and other functions...........
+    
+	</script>
+
+</body>
+</html>

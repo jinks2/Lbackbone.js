@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<script src="../lib/underscore.js"></script>
+	<script src="../lib/jquery-1.9.0.min.js"></script>
+	<script src="../lib/backbone.js"></script>
+    <style>
+    .incomplete{
+        background-color: #ccc;
+    }
+    .complete{
+        background-color: pink;
+    }
+    </style>
+</head>
+<body>
+
+ <div id="app"></div>
+	<script>
+    /*Collection view*/
+
+    var TodoItem = Backbone.Model.extend({
+        defaults: { 
+            description: "Empty todo",
+            sdtatus: "incomplete"
+        },
+        toggleStatus: function() {
+            if(this.get("status") === "incomplete") {
+                this.set({"status" : "complete"}); 
+            } else {
+                this.set({"status" : "incomplete"});
+            }
+            //this.save(); PUT/todos/1; 
+        }
+    });
+
+    var TodoView = Backbone.View.extend({
+        events: {
+            "change input" : "toggleStatus",
+            "click a": "cancel"
+        },
+        initialize: function() {
+            this.model.on("change",this.render,this);
+            this.model.on("hide",this.remove,this);
+        },
+        toggleStatus: function() {
+           this.model.toggleStatus();
+        },
+        cancel: function() {
+            this.$el.remove();
+        },
+        template: _.template("<h3 class='<%= status %>'>" + "<input type=checkbox />" +
+            " <%= description %> <a href='#'>&#120;</a></h3>"), 
+        render: function() {
+                this.$el.html(this.template(this.model.toJSON()));
+                return this;                
+        }
+    });
+
+    var TodoList = Backbone.Collection.extend({
+        model: TodoItem,
+        initialize: function() {
+            this.on("remove",this.hideModel);
+        },
+        hideModel: function(modoel) {
+            model.trigger("hide");
+        }
+
+    });
+
+    var TodoListView = Backbone.View.extend({
+        initialize: function() {
+          this.collection.on("add",this.addOne,this);
+          this.collection.on("reset",this.addAll,this);
+        },
+        addOne: function(todoItem) {
+          var todoView = new TodoView({model: todoItem});
+          this.$el.append(todoView.render().el);
+        },
+        addAll: function() {
+            this.collection.forEach(this.addOne,this);
+        },
+        render: function() {
+          this.addAll();
+        }
+    });
+
+    var todoItem = new TodoItem(); 
+    var todoView = new TodoView({model:todoItem});
+    var todoList = new TodoList(); 
+    var todoListView = new TodoListView({collection: todoList});
+    //todoList.fetch();
+
+    todoView.render();
+    todoListView.render();
+    
+    console.log(todoListView.el);
+    //add new
+    var newTodoItem = new TodoItem({
+        description: "Take out trash",
+        status: "incomplete"
+    });
+    todoList.add(newTodoItem);
+
+    $("body").append(todoView.el);
+    $("body").append(todoListView.el);
+    
+
+
+    /*another example*/
+    //models:
+    var Appointment = Backbone.Model.extend({
+        defaults: {
+            title: "title"
+        }
+    });
+    var AppointmentList = Backbone.Collection.extend({
+      model: Appointment
+    });
+    
+    //view:
+    var AppointmentView = Backbone.View.extend({
+      initialize: function(){
+        this.model.on('hide', this.remove, this);
+      },
+      template: _.template('<span>' +
+                            '<%= title %></span>' +
+                            '<a href="#">x</a>'),
+      render: function(){
+        this.$el.html(this.template(this.model.toJSON()));
+        return this;
+      },
+      remove: function(){
+        this.$el.remove();
+      }
+    });
+
+
+    var AppointmentListView = Backbone.View.extend({
+      initialize: function(){
+        this.collection.on('add', this.addOne, this);
+        this.collection.on('reset', this.render, this);
+      },
+      render: function(){
+        this.collection.forEach(this.addOne, this);
+      },
+      addOne: function(model){
+        var appointmentView = new AppointmentView({model: model});
+        appointmentView.render();
+        this.$el.append(appointmentView.el);
+      }
+    });
+
+    var AppointmentList = Backbone.Collection.extend({
+        model: Appointment,
+        initialize: function(){
+          this.on('remove', this.hideModel);
+        },
+        hideModel: function(model){
+         model.trigger('hide');
+        }
+    });
+    var appointmentList = new AppointmentList();
+    var appointmentsView = new AppointmentListView({collection: appointmentList});
+
+    appointmentsView.render();
+
+    $('#app').html(appointmentsView.el);
+
+	</script>
+
+</body>
+</html>
